@@ -1,11 +1,12 @@
 #!/bin/bash
 set -e
 
-# Update system (recommended first step)
+# 1. Update system and install essential tools FIRST
 sudo pacman -Syu --noconfirm
+sudo pacman -S --needed base-devel git --noconfirm  # <-- Git moved here
 
-# Base system components
-# ----------------------
+# 2. System Services
+# ------------------
 # Bluetooth
 sudo pacman -S bluez bluez-utils --noconfirm
 sudo systemctl enable --now bluetooth.service
@@ -14,45 +15,41 @@ sudo systemctl enable --now bluetooth.service
 sudo pacman -S networkmanager network-manager-applet --noconfirm
 sudo systemctl enable --now NetworkManager
 
-# Audio
+# 3. Audio Subsystem
 sudo pacman -S pipewire pipewire-pulse pipewire-jack pipewire-alsa --noconfirm
 systemctl --user enable --now pipewire pipewire-pulse
 
-# Fonts
+# 4. Fonts
 sudo pacman -S ttf-dejavu ttf-liberation ttf-ubuntu-font-family noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra ttf-freefont ttf-opensans ttf-roboto ttf-inconsolata ttf-hack cantarell-fonts ttf-nimbus --noconfirm
 
-# Build essentials and AUR helper
-# -------------------------------
-sudo pacman -S --needed base-devel git --noconfirm
+# 5. Install Yay (AUR Helper)
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si --noconfirm
 cd ..
 rm -rf yay
 
-# System dependencies
-# -------------------
-sudo pacman -S gtkmm3 jsoncpp libsigc++ fmt wayland chrono-date spdlog gtk3 gobject-introspection libgirepository libpulse libnl libappindicator-gtk3 libdbusmenu-gtk3 libmpdclient libsndio libevdev xkbregistry upower meson ninja --noconfirm
+# 6. Fix Dependency Issues
+# ------------------------
+# Corrected package names:
+sudo pacman -S gtkmm3 jsoncpp libsigc++ fmt wayland boost-libs spdlog gtk3 gobject-introspection libgirepository libpulse libnl libappindicator-gtk3 libdbusmenu-gtk3 libmpdclient libsndio libevdev xkbregistry upower meson ninja --noconfirm
 sudo pacman -S go gtk3 xcur2png gsettings-desktop-schemas --noconfirm
 
-# Hyprland ecosystem
-# ------------------
+# 7. Hyprland Ecosystem
 sudo pacman -S hyprland hyprpaper hypridle hyprlock xdg-desktop-portal-hyprland --noconfirm
 
-# GUI components
-# --------------
-# Notification daemon
-sudo pacman -S dunst --noconfirm
+# 8. GUI Components
+sudo pacman -S dunst rofi --noconfirm
 
-# Application launcher
-sudo pacman -S rofi --noconfirm
+# Rofi Setup
 git clone --depth=1 https://github.com/adi1090x/rofi.git
 cd rofi
 chmod +x setup.sh
 ./setup.sh
 cd ..
 
-# Status bar
+# Waybar (with explicit dependencies)
+sudo pacman -S cmake wayland-protocols --noconfirm  # <-- Added missing deps
 git clone https://github.com/Alexays/Waybar
 cd Waybar
 meson setup build
@@ -60,24 +57,17 @@ ninja -C build
 sudo ninja -C build install
 cd ..
 
-# Theming
-# -------
+# 9. Theming
 sudo pacman -S qt5-base qt6-base nwg-look kvantum --noconfirm
 
-# File manager
+# 10. File Manager
 sudo pacman -S thunar thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin xarchiver --noconfirm
 
-# Additional applications
-# -----------------------
+# 11. Utilities
 sudo pacman -S mousepad nvtop mpv neovim --noconfirm
 
-# AUR packages
-# ------------
+# 12. AUR Packages
 yay -S hyprsunset --noconfirm
 
-# Final recommendations
-echo "Installation complete!"
-echo "Recommended actions:"
-echo "1. Reboot your system"
-echo "2. Configure your Hyprland environment"
-echo "3. Copy Waybar/Rofi config files to ~/.config"
+echo "Installation completed successfully!"
+echo "Reboot and configure your Hyprland setup."
